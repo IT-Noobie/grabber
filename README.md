@@ -61,10 +61,48 @@ This is still in WIP:
 grabber add -c <CLIENT>
 ```
 
-## List repositories
-This is still in WIP:
+## List (WIP)
+### List platforms
+```shell
+grabber list
+╭─────────────────────────╮
+│ PLATFORMS SSH KEY ALIAS │
+╞═════════════════════════╡
+│ azure                   │
+├╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┤
+│ github                  │
+╰─────────────────────────╯
+```
+### List platform configuration
+```shell 
+grabber list -p azure
+╭────────────────────────────────────────────────╮
+│ AZURE                                          │
+╞════════════════════════════════════════════════╡
+│ private_key = "/home/it-noobie/.ssh/azure"     │
+│ public_key = "/Users/it-noobie/.ssh/azure.pub" │
+│                                                │
+╰────────────────────────────────────────────────╯
+```
+### List client platforms
 ```shell
 grabber list -c <CLIENT>
+╭────────────────────╮
+│  CLIENT PLATFORMS  │
+╞════════════════════╡
+│ azure              │
+├╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┤
+│ github             │
+╰────────────────────╯
+```
+### List repositories of a client in a given platform
+```shell
+grabber list -c it-noobie -p github
+╭────────────────────────────────────────╮
+│ IT-NOOBIE GITHUB REPOSITORIES          │
+╞════════════════════════════════════════╡
+│ "git@github.com:IT-Noobie/grabber.git" │
+╰────────────────────────────────────────╯
 ```
 
 
