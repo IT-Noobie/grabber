@@ -10,3 +10,4 @@ clap = { version = "4.0.18", features = ["cargo", "derive", "color"] }
 toml = "0.5.9"
 colored = "2.0.0"
 dirs = "4.0.0"
+comfy-table = "6.1.2"
