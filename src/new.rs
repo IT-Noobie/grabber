@@ -1,9 +1,9 @@
-use toml::map::Map;
-use toml::Value;
 use colored::*;
 use std::fs::OpenOptions;
 use std::io;
 use std::io::Write;
+use toml::map::Map;
+use toml::Value;
 
 struct Config {
     ssh_key_alias: String,
@@ -24,7 +24,10 @@ impl Config {
 }
 
 pub fn new(client_name: &String) {
-	let repositories_config_file = format!("{}/.grabber/grabber-repositories.toml", dirs::home_dir().unwrap().display());
+    let repositories_config_file = format!(
+        "{}/.grabber/grabber-repositories.toml",
+        dirs::home_dir().unwrap().display()
+    );
     let mut file = OpenOptions::new()
         .append(true)
         .open(repositories_config_file)
@@ -73,7 +76,10 @@ pub fn new(client_name: &String) {
         let platform = config.add_platform();
 
         let mut client: Map<String, Value> = Map::new();
-        client.insert(client_name.clone().to_ascii_lowercase(), Value::Table(platform));
+        client.insert(
+            client_name.clone().to_ascii_lowercase(),
+            Value::Table(platform),
+        );
 
         let toml_content = toml::to_string(&client).expect("ERROR: Parse TOML error");
 
@@ -99,5 +105,9 @@ pub fn new(client_name: &String) {
             false => add_platform += 1,
         }
     }
-	println!("{}: {}", "The following client has been added".green().bold(), client_name);
+    println!(
+        "{}: {}",
+        "The following client has been added".green().bold(),
+        client_name
+    );
 }

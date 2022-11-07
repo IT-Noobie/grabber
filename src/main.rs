@@ -1,7 +1,7 @@
 use std::process::exit;
 
+use clap::ArgGroup;
 use clap::{Parser, Subcommand};
-
 mod list;
 mod new;
 mod setup;
@@ -20,18 +20,30 @@ enum Commands {
         #[clap(short, long)]
         /// Repository SSH string to clone it
         repo: String,
+
         #[clap(short, long)]
         /// Client to add the repository
         client: String,
     },
     /// List client platforms and repositories
+    #[command(arg_required_else_help = true)]
+    #[command(group = ArgGroup::new("simple").conflicts_with_all(["client", "platform"]))]
     List {
         #[clap(short, long)]
         /// Name of the client to list
         client: Option<String>,
+
         #[clap(short, long)]
         /// Name of the platform key alias
         platform: Option<String>,
+
+        #[clap(group = "simple", long)]
+        /// List all platform ssh key alias
+        ssh: bool,
+
+        #[clap(group = "simple", long)]
+        /// List all clients
+        clients: bool,
     },
     /// Adds a new Client
     New {
@@ -52,7 +64,12 @@ fn main() {
                 repo, client
             )
         }
-        Commands::List { client, platform } => {
+        Commands::List {
+            client,
+            platform,
+            ssh,
+            clients,
+        } => {
             if client.is_some() && platform.is_some() {
                 match list::client_platform_repositories(
                     &client.to_owned().unwrap(),
@@ -83,13 +100,24 @@ fn main() {
                     }
                 };
             };
-            match list::platforms() {
-                Ok(_) => (),
-                Err(err) => {
-                    eprintln!("ERROR: {}", err);
-                    exit(1);
+            if ssh.to_string() == "true" {
+                match list::platforms() {
+                    Ok(_) => exit(0),
+                    Err(err) => {
+                        eprintln!("ERROR: {}", err);
+                        exit(1);
+                    }
+                };
+            }
+            if clients.to_string() == "true" {
+                match list::clients() {
+                    Ok(_) => exit(0),
+                    Err(err) => {
+                        eprintln!("ERROR: {}", err);
+                        exit(1);
+                    }
                 }
-            };
+            }
         }
         Commands::New { client } => {
             println!("New client {:?} will be configured", client);

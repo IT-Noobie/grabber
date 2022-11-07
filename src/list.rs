@@ -34,6 +34,34 @@ pub fn platforms() -> Result<(), Error> {
     Ok(())
 }
 
+pub fn clients() -> Result<(), Error> {
+    let ssh_config_file_path: String = format!(
+        "{}/.grabber/grabber-repositories.toml",
+        dirs::home_dir().unwrap().display()
+    );
+    let mut file = File::open(ssh_config_file_path)?;
+    let mut contents = String::new();
+
+    file.read_to_string(&mut contents)?;
+    let mut table = comfy_table::Table::new();
+    table
+        .set_header(vec![format!("CLIENTS")])
+        .load_preset(UTF8_FULL)
+        .apply_modifier(UTF8_ROUND_CORNERS)
+        .set_content_arrangement(ContentArrangement::Dynamic);
+
+    let toml: Table = toml::from_str(&mut contents)?;
+    //let keys = toml.into.collect::<Value>;
+    let clients = toml.keys();
+    for key in clients {
+        let mut row: Row = Row::new();
+        row.add_cell(Cell::new(&key));
+        table.add_row(row);
+    }
+    println!("{}", table);
+    Ok(())
+}
+
 pub fn client_platform(client: &String) -> Result<(), Error> {
     let ssh_config_file_path: String = format!(
         "{}/.grabber/grabber-repositories.toml",
