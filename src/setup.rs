@@ -6,6 +6,23 @@ use std::io::Write;
 use toml::map::Map;
 use toml::Value;
 
+struct Input {
+    message: String,
+}
+
+impl Input {
+    fn input(&self) -> String {
+        let mut value: String = String::new();
+        print!("{}", self.message.bold());
+        let _ = io::stdout().flush();
+        io::stdin()
+            .read_line(&mut value)
+            .expect("Error reading from STDIN");
+        value.pop();
+        value
+    }
+}
+
 pub fn setup() {
     create_grabber_directory();
     let mut n: i32 = 0;
@@ -34,34 +51,18 @@ pub fn setup() {
 }
 
 fn create_config_file() -> std::io::Result<()> {
-    let mut platform_ssh_key_alias: String = String::new();
-    print!("{}", "Enter platform ssh key alias: ".bold());
-    let _ = io::stdout().flush();
-    io::stdin()
-        .read_line(&mut platform_ssh_key_alias)
-        .expect("Error reading from STDIN");
+    let message: String = String::from("Enter platform ssh key alias: ");
+    let platform_ssh_key_alias: String = Input { message }.input();
 
-    let mut private_key: String = String::new();
-    print!("{}", "Enter private key absolute path: ".bold());
-    let _ = io::stdout().flush();
-    io::stdin()
-        .read_line(&mut private_key)
-        .expect("Error reading from STDIN");
+    let message: String = String::from("Enter private key absolute path: ");
+    let private_key: String = Input { message }.input();
 
-    let mut public_key: String = String::new();
-    print!("{}", "Enter public key absolute path: ".bold());
-    let _ = io::stdout().flush();
-    io::stdin()
-        .read_line(&mut public_key)
-        .expect("Error reading from STDIN");
-
-    // remove carriage return of stdin
-    platform_ssh_key_alias.pop();
-    private_key.pop();
-    public_key.pop();
+    let message: String = String::from("Enter public key absolute path: ");
+    let public_key: String = Input { message }.input();
 
     let mut config: Map<String, Value> = Map::new();
     let mut values: Map<String, Value> = Map::new();
+
     values.insert(String::from("private_key"), Value::String(private_key));
     values.insert(String::from("public_key"), Value::String(public_key));
     config.insert(platform_ssh_key_alias, Value::Table(values));
@@ -86,22 +87,28 @@ fn create_config_file() -> std::io::Result<()> {
 
 fn create_grabber_directory() {
     let home_directory_path = format!("{}/.grabber", dirs::home_dir().unwrap().display());
-    fs::create_dir(&home_directory_path).expect("ERROR: Unable to create grabber directory");
-    println!("Directory has been created at ~/.grabber/");
+    match fs::create_dir(&home_directory_path) {
+        Ok(_) => println!("Directory has been created at ~/.grabber/"),
+        Err(_) => eprintln!("Directory already exists"),
+    }
 
     let platform_config_file_path: String = format!("{}/grabber-config.toml", &home_directory_path);
     let repository_file_path: String =
         format!("{}/grabber-repositories.toml", &home_directory_path);
-    fs::File::create(&platform_config_file_path)
-        .expect("ERROR: Unable to create grabber config file");
-    fs::File::create(&repository_file_path).expect("ERROR: Unable to create repositories file");
 
-    println!(
-        "grabber config file has been successfully created at: {}",
-        platform_config_file_path
-    );
-    println!(
-        "Repositories file has been successfully created at: {}\n",
-        repository_file_path
-    );
+    match fs::File::create(&platform_config_file_path) {
+        Ok(_) => println!(
+            "Grabber config file has been successfully created at: {}",
+            platform_config_file_path
+        ),
+        Err(_) => eprintln!("ERROR: File already exists"),
+    }
+
+    match fs::File::create(&repository_file_path) {
+        Ok(_) => println!(
+            "Repositories file has been successfully created at: {}",
+            repository_file_path
+        ),
+        Err(_) => eprintln!("ERROR: File already exists"),
+    }
 }

@@ -71,7 +71,7 @@ fn add(client: &String, platform: &String) -> Result<(), Error> {
                 None => {
                     eprintln!("ERROR: platform doesn't exist. Run grabber list -c <CLIENT> to list platforms");
                     exit(1)
-                },
+                }
                 Some(repositories) => {
                     println!(
                         "{}",
@@ -98,4 +98,3 @@ fn add(client: &String, platform: &String) -> Result<(), Error> {
     }
     Ok(())
 }
-
