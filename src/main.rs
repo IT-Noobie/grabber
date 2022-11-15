@@ -61,7 +61,7 @@ fn main() {
     match &value.command {
         Commands::Add { client, platform } => {
             if platform.is_none() {
-                match add::add_repository(client) {
+                match add::add_platform_repository(client, platform) {
                     Ok(_) => exit(0),
                     Err(err) => {
                         eprintln!("ERROR: {}", err);
