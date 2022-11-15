@@ -7,7 +7,9 @@ edition = "2021"
 
 [dependencies]
 clap = { version = "4.0.18", features = ["cargo", "derive", "color"] }
-toml = "0.5.9"
 colored = "2.0.0"
-dirs = "4.0.0"
 comfy-table = "6.1.2"
+dirs = "4.0.0"
+toml_edit = "0.15.0"
+toml = "0.5.9"
+serde = { version = "1.0.147", features = ["derive"] }

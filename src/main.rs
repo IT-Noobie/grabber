@@ -2,6 +2,7 @@ use std::process::exit;
 
 use clap::ArgGroup;
 use clap::{Parser, Subcommand};
+mod add;
 mod list;
 mod new;
 mod setup;
@@ -18,12 +19,12 @@ enum Commands {
     /// Add one or multiple repositories to a client
     Add {
         #[clap(short, long)]
-        /// Repository SSH string to clone it
-        repo: String,
-
-        #[clap(short, long)]
         /// Client to add the repository
         client: String,
+
+        #[clap(short, long)]
+        /// Platform to add the repository
+        platform: Option<String>,
     },
     /// List client platforms and repositories
     #[command(arg_required_else_help = true)]
@@ -58,11 +59,25 @@ enum Commands {
 fn main() {
     let value = Value::parse();
     match &value.command {
-        Commands::Add { repo, client } => {
-            println!(
-                "New repositoriy {:?} will be added to client {:?}",
-                repo, client
-            )
+        Commands::Add { client, platform } => {
+            if platform.is_none() {
+                match add::add_repository(client) {
+                    Ok(_) => exit(0),
+                    Err(err) => {
+                        eprintln!("ERROR: {}", err);
+                        exit(1);
+                    }
+                }
+            }
+            if platform.is_some() {
+                match add::add_platform_repository(client, platform) {
+                    Ok(_) => exit(0),
+                    Err(err) => {
+                        eprintln!("ERROR: {}", err);
+                        exit(1);
+                    }
+                }
+            }
         }
         Commands::List {
             client,
