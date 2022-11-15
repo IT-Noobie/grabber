@@ -6,8 +6,25 @@ use toml::map::Map;
 use toml::Value;
 
 struct Config {
-    ssh_key_alias: String,
+    platform_ssh_key_alias: String,
     repositories: Vec<Value>,
+}
+
+struct Input {
+    message: String,
+}
+
+impl Input {
+    fn input(&self) -> String {
+        let mut value: String = String::new();
+        print!("{}", self.message.bold());
+        let _ = io::stdout().flush();
+        io::stdin()
+            .read_line(&mut value)
+            .expect("Error reading from STDIN");
+        value.pop();
+        value
+    }
 }
 
 impl Config {
@@ -18,7 +35,7 @@ impl Config {
             String::from("repositories"),
             Value::Array(self.repositories),
         );
-        platform.insert(self.ssh_key_alias, Value::Table(repositories));
+        platform.insert(self.platform_ssh_key_alias, Value::Table(repositories));
         platform
     }
 }
@@ -39,14 +56,9 @@ pub fn new(client_name: &String) {
         let mut repositories: Vec<Value> = Vec::new();
         let mut continue_adding_repositories: i32 = 0;
 
-        let mut ssh_key_alias: String = String::new();
-        print!("{}", "Enter ssh_key_alias: ".bold());
-        let _ = io::stdout().flush();
-        io::stdin()
-            .read_line(&mut ssh_key_alias)
-            .expect("Error reading from STDIN");
-        // remove carriage return
-        ssh_key_alias.pop();
+        let message: String = String::from("Enter platform ssh key alias: ");
+        let platform_ssh_key_alias: String = Input { message }.input();
+    
         println!(
             "{}",
             "Use 'quit' to stop adding repositories"
@@ -55,14 +67,8 @@ pub fn new(client_name: &String) {
         );
 
         while continue_adding_repositories == 0 {
-            let mut repository_url: String = String::new();
-            print!("{}", "Enter ssh repository url: ".bold());
-            let _ = io::stdout().flush();
-            io::stdin()
-                .read_line(&mut repository_url)
-                .expect("Error reading from STDIN");
-            // remove carriage return
-            repository_url.pop();
+            let message: String = String::from("Enter ssh repository url: ");
+            let repository_url: String = Input { message }.input();
 
             match &repository_url.eq("quit") {
                 true => continue_adding_repositories += 1,
@@ -70,7 +76,7 @@ pub fn new(client_name: &String) {
             }
         }
         let config: Config = Config {
-            ssh_key_alias,
+            platform_ssh_key_alias,
             repositories,
         };
         let platform = config.add_platform();
