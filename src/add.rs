@@ -66,11 +66,11 @@ fn add(client: &String, platform: &String) -> Result<(), Error> {
 
     let mut continue_adding_repositories: i32 = 0;
     while continue_adding_repositories == 0 {
-        match toml_edit::Document::from_str(&mut contents) {
-            Ok(mut file) => match file[&client][&platform]["repositories"].as_array_mut() {
+        match toml_edit::Document::from_str(&contents) {
+            Ok(mut file) => match file[client][platform]["repositories"].as_array_mut() {
                 None => {
-                    eprintln!("ERROR: platform doesn't exist. Run grabber list -c <CLIENT> to list platforms");
-                    exit(1)
+                    eprintln!("ERROR: client or platform doesn't exist. Run grabber list -c <CLIENT> to list platforms");
+                    exit(3)
                 }
                 Some(repositories) => {
                     println!(

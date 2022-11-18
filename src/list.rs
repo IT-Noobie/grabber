@@ -24,10 +24,10 @@ pub fn platforms() -> Result<(), Error> {
         .load_preset(UTF8_FULL)
         .apply_modifier(UTF8_ROUND_CORNERS)
         .set_content_arrangement(ContentArrangement::Dynamic);
-    let toml: Table = toml::from_str(&mut contents)?;
+    let toml: Table = toml::from_str(&contents)?;
     for key in toml.keys() {
         let mut row: Row = Row::new();
-        row.add_cell(Cell::new(&key));
+        row.add_cell(Cell::new(key));
         table.add_row(row);
     }
     println!("{table}");
@@ -50,12 +50,12 @@ pub fn clients() -> Result<(), Error> {
         .apply_modifier(UTF8_ROUND_CORNERS)
         .set_content_arrangement(ContentArrangement::Dynamic);
 
-    let toml: Table = toml::from_str(&mut contents)?;
+    let toml: Table = toml::from_str(&contents)?;
     //let keys = toml.into.collect::<Value>;
     let clients = toml.keys();
     for key in clients {
         let mut row: Row = Row::new();
-        row.add_cell(Cell::new(&key));
+        row.add_cell(Cell::new(key));
         table.add_row(row);
     }
     println!("{}", table);
@@ -70,7 +70,7 @@ pub fn client_platform(client: &String) -> Result<(), Error> {
     let mut file = File::open(ssh_config_file_path)?;
     let mut contents = String::new();
     file.read_to_string(&mut contents)?;
-    let toml: Value = toml::from_str(&mut contents)?;
+    let toml: Value = toml::from_str(&contents)?;
     let mut table = comfy_table::Table::new();
     table
         .set_header(vec![format!("{} PLATFORMS", &client.to_ascii_uppercase())])
@@ -78,7 +78,7 @@ pub fn client_platform(client: &String) -> Result<(), Error> {
         .apply_modifier(UTF8_ROUND_CORNERS)
         .set_content_arrangement(ContentArrangement::Dynamic);
 
-    match toml.get(&client) {
+    match toml.get(client) {
         None => {
             eprintln!("ERROR: Doesn't exist client {}", &client);
             exit(1)
@@ -89,7 +89,7 @@ pub fn client_platform(client: &String) -> Result<(), Error> {
                 Some(inner_table) => {
                     for key in inner_table.keys() {
                         let mut row: Row = Row::new();
-                        row.add_cell(Cell::new(&key));
+                        row.add_cell(Cell::new(key));
                         table.add_row(row);
                     }
                     println!("{}", table);
@@ -114,7 +114,7 @@ pub fn platform_key_alias_config(platform_key_alias: &String) -> Result<(), Erro
     let toml: Table = toml::from_str(&contents)?;
     match toml.get(platform_key_alias) {
         None => eprintln!("ERROR: SSH key configuration not found for: {}\nRun 'grabber list' to show a list of all configured keys.", platform_key_alias),
-        Some(i) => {
+        Some(key) => {
             let mut table = comfy_table::Table::new();
             table
                 .set_header(vec![&platform_key_alias.to_ascii_uppercase()])
@@ -122,7 +122,7 @@ pub fn platform_key_alias_config(platform_key_alias: &String) -> Result<(), Erro
                 .apply_modifier(UTF8_ROUND_CORNERS)
                 .set_content_arrangement(ContentArrangement::Dynamic);
             let mut row: Row = Row::new();
-            row.add_cell(Cell::new(&i));
+            row.add_cell(Cell::new(key));
             table.add_row(row);
             println!("{}", table);
         },
@@ -139,7 +139,7 @@ pub fn client_platform_repositories(client: &String, platform: &String) -> Resul
     let mut file = File::open(ssh_config_file_path)?;
     let mut contents = String::new();
     file.read_to_string(&mut contents)?;
-    let toml: Value = toml::from_str(&mut contents)?;
+    let toml: Value = toml::from_str(&contents)?;
 
     match toml.get(client) {
         None => eprintln!("ERROR: SSH key configuration not found for: {}\nRun 'grabber list' to show a list of all configured keys.", client),
@@ -156,7 +156,7 @@ pub fn client_platform_repositories(client: &String, platform: &String) -> Resul
                     let inner_table = platform_key_alias["repositories"].as_array().unwrap();
                     for value in inner_table {
                         let mut row: Row = Row::new();
-                        row.add_cell(Cell::new(&value));
+                        row.add_cell(Cell::new(value));
                         table.add_row(row);
                     }
                     println!("{}", table);
